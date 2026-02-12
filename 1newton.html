@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Hukum I Newton dan Hukum Kelembaman</title>
+    <style>
+        /* ======== Tampilan Umum ======== */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a8e063, #56ab2f);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 10px;
+            margin: 0;
+            text-align: center;
+        }
+
+        h1 {
+            color: #1f3a56;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        /* ======== Panel Informasi ======== */
+        #info-panel {
+            background: rgba(255, 255, 255, 0.92);
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+            max-width: 720px;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        #info-panel p {
+            margin: 10px 0;
+        }
+
+        #info-panel strong {
+            color: #2c3e50;
+        }
+
+        #info-panel ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        #info-panel li {
+            margin-bottom: 6px;
+        }
+
+        /* ======== Canvas ======== */
+        canvas {
+            background: #ffffff;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-width: 90%;
+            height: auto;
+        }
+
+        /* ======== Tombol Kontrol ======== */
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* ======== Responsif ======== */
+        @media (max-width: 600px) {
+            #info-panel {
+                padding: 20px;
+                font-size: 15px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Simulasi Hukum I Newton dan Hukum Kelembaman</h1>
+
+    <div id="info-panel">
+        <p><strong>Hukum I Newton (Hukum Inersia):</strong> Jika resultan gaya pada benda adalah nol, benda yang diam akan tetap diam, dan benda yang bergerak akan tetap bergerak lurus beraturan (kecepatan konstan).</p>
+        <p><strong>Hukum Kelembaman:</strong> Benda memiliki kecenderungan untuk mempertahankan keadaan geraknya, kecuali ada gaya luar yang mengubahnya.</p>
+        <p><strong>Dalam simulasi ini:</strong></p>
+        <ul>
+            <li>Jika bola diam dan tidak ada gaya, bola akan tetap diam.</li>
+            <li>Jika bola bergerak tanpa gaya, ia akan bergerak lurus beraturan dengan kecepatan konstan.</li>
+            <li>Jika gaya diterapkan, kecepatan bola berubah (mengalami percepatan). Setelah gaya dihentikan, bola mempertahankan kecepatan barunya.</li>
+            <li>Tombol <em>"Stop Gerak"</em> mensimulasikan gaya penghenti yang membuat kecepatan bola menjadi nol.</li>
+        </ul>
+    </div>
+
+    <canvas id="simulationCanvas" width="800" height="400"></canvas>
+
+    <div class="controls">
+        <button id="startMotion">Mulai Gerak</button>
+        <button id="stopMotion">Stop Gerak</button>
+        <button id="applyForce">Terapkan gaya</button>
+        <button id="reset">Reset Simulasi</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let x = 50;
+        let y = 200;
+        let radius = 20;
+        let speed = 0;
+        let direction = 1;
+        let isForceApplied = false;
+        const acceleration = 0.1;
+        
+        function drawBall() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#e67e22';
+            ctx.fill();
+            ctx.closePath();
+        }
+        
+        function animate() {
+            if (speed !== 0) {
+                x += speed * direction;
+            }
+            if (x > canvas.width + radius) x = -radius;
+            if (x < -radius) x = canvas.width + radius;
+            drawBall();
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        document.getElementById('startMotion').addEventListener('click', () => {
+            speed = 2;
+            direction = 1;
+        });
+        
+        document.getElementById('stopMotion').addEventListener('click', () => {
+            speed = 0;
+        });
+        
+        document.getElementById('applyForce').addEventListener('click', () => {
+            direction = -direction;
+            isForceApplied = true;
+            const interval = setInterval(() => {
+                if (isForceApplied) {
+                    speed += acceleration * direction;
+                }
+            }, 100);
+            setTimeout(() => {
+                isForceApplied = false;
+                clearInterval(interval);
+            }, 2000);
+        });
+        
+        document.getElementById('reset').addEventListener('click', () => {
+            speed = 0;
+            x = 50;
+            y = 200;
+            direction = 1;
+            isForceApplied = false;
+        });
+    </script>
+</body>
+</html>

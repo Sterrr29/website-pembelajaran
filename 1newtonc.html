@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newton's Laws Simulations</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #fce4ec); /* Soft pastel gradient */
+            color: #424242;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #6a1b9a; /* Soft purple */
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            max-width: 1200px;
+            padding: 20px;
+        }
+        .simulation {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            width: 300px;
+        }
+        .simulation:hover {
+            transform: scale(1.05);
+        }
+        .simulation img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .simulation h2 {
+            font-size: 1.5em;
+            color: #388e3c; /* Soft green */
+            margin: 15px 0;
+        }
+        .simulation p {
+            font-size: 1em;
+            color: #757575;
+        }
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Explore Newton's Laws</h1>
+    <div class="container">
+        <a href="1newton.html">
+            <div class="simulation">
+                <img src="3newton/3newton.png" alt="HTML5 Simulation">
+                <h2>HTML5 Simulation</h2>
+                <p>Interactive simulation of Newton's laws using HTML5. Click to explore!</p>
+            </div>
+        </a>
+        <a href="1newtonb.html">
+            <div class="simulation">
+                <img src="3newtonb/3newtonb.png" alt="Virtual Lab">
+                <h2>Virtual Lab</h2>
+                <p>Virtual laboratory for experimenting with Newton's principles. Click to enter!</p>
+            </div>
+        </a>
+    </div>
+</body>
+</html>

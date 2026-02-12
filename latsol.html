@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan Soal Fisika - Dinamika Gerak</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* Alice blue, warna lembut dan nyaman */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            color: #2e8b57; /* Sea green, menarik tapi tidak menyilaukan */
+            margin-bottom: 30px;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .user-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e6f7ff; /* Light cyan, kontras lembut */
+            border-radius: 8px;
+            border-left: 5px solid #2e8b57;
+        }
+        .user-info label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .user-info input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e6f7ff; /* Light cyan, kontras lembut */
+            border-radius: 8px;
+            border-left: 5px solid #2e8b57;
+        }
+        .question h3 {
+            margin-top: 0;
+            color: #2e8b57;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            background-color: #2e8b57;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #228b22; /* Forest green, sedikit lebih gelap */
+        }
+        #result {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #d4edda; /* Light green untuk hasil positif */
+            border-radius: 8px;
+            text-align: center;
+        }
+        #result h2 {
+            color: #155724;
+        }
+        #drive-button {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kuis Interaktif Fisika: Hukum Newton dan Momentum</h1>
+    <div class="quiz-container">
+        <div class="user-info">
+            <label for="nama">Nama:</label>
+            <input type="text" id="nama" required>
+            <label for="kelas">Kelas:</label>
+            <input type="text" id="kelas" required>
+        </div>
+        <form id="quiz-form">
+            <div class="question">
+                <h3>Soal 1 – Hukum I Newton (Analisis Fenomena)</h3>
+                <p>Dalam simulasi mobil yang direm mendadak, penumpang terdorong ke depan meskipun tidak ada gaya yang mendorong tubuhnya ke arah depan.</p>
+                <p>Kesimpulan ilmiah yang paling tepat adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q1" value="A"> A. Tubuh penumpang mempertahankan keadaan geraknya ketika mobil berhenti</label>
+                    <label><input type="radio" name="q1" value="B"> B. Gaya gesek kursi mendorong tubuh ke depan</label>
+                    <label><input type="radio" name="q1" value="C"> C. Gaya berat penumpang bertambah secara tiba-tiba</label>
+                    <label><input type="radio" name="q1" value="D"> D. Gaya mesin mobil masih bekerja saat rem ditekan</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Soal 2 – Hukum II Newton (Evaluasi Hubungan Variabel)</h3>
+                <p>Pada simulasi troli, gaya dorong tetap, tetapi massa troli diperbesar dua kali lipat. Data simulasi menunjukkan percepatan troli menurun.</p>
+                <p>Argumen ilmiah yang paling logis untuk menjelaskan data tersebut adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q2" value="A"> A. Percepatan berbanding lurus dengan massa benda</label>
+                    <label><input type="radio" name="q2" value="B"> B. Resultan gaya berkurang karena massa bertambah</label>
+                    <label><input type="radio" name="q2" value="C"> C. Percepatan berbanding terbalik dengan massa jika gaya konstan</label>
+                    <label><input type="radio" name="q2" value="D"> D. Gaya gesek meningkat seiring bertambahnya massa tanpa pengaruh lain</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Soal 3 – Hukum III Newton (Penalaran Kausal)</h3>
+                <p>Dalam simulasi orang mendorong tembok, tembok tidak bergerak, tetapi orang merasa tangannya terdorong ke belakang.</p>
+                <p>Penjelasan ilmiah yang paling tepat adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q3" value="A"> A. Gaya dorong orang lebih kecil dari gaya berat tembok</label>
+                    <label><input type="radio" name="q3" value="B"> B. Tembok memberikan gaya reaksi yang sama besar dan berlawanan arah</label>
+                    <label><input type="radio" name="q3" value="C"> C. Gaya orang hilang sebelum sampai ke tembok</label>
+                    <label><input type="radio" name="q3" value="D"> D. Tidak terjadi gaya reaksi karena tembok diam</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Soal 4 – Gaya Normal dan Keseimbangan (Analisis Gaya)</h3>
+                <p>Balok diletakkan di atas meja datar dan tetap diam. Berdasarkan simulasi, balok mengalami dua gaya utama.</p>
+                <p>Pernyataan yang paling tepat adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q4" value="A"> A. Gaya normal lebih besar dari gaya berat</label>
+                    <label><input type="radio" name="q4" value="B"> B. Gaya berat balok dihilangkan oleh meja</label>
+                    <label><input type="radio" name="q4" value="C"> C. Gaya normal dan gaya berat sama besar sehingga resultan gaya nol</label>
+                    <label><input type="radio" name="q4" value="D"> D. Gaya gesek menahan balok agar tidak jatuh</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Soal 5 – Gaya Gesek (Evaluasi Kondisi)</h3>
+                <p>Gerobak pada simulasi meluncur lebih cepat saat melewati jalan basah dibandingkan jalan kering.</p>
+                <p>Argumen ilmiah yang paling kuat adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q5" value="A"> A. Jalan basah memperbesar gaya gesek</label>
+                    <label><input type="radio" name="q5" value="B"> B. Gaya berat gerobak berkurang saat hujan</label>
+                    <label><input type="radio" name="q5" value="C"> C. Gaya gesek berkurang sehingga gaya penghambat gerak lebih kecil</label>
+                    <label><input type="radio" name="q5" value="D"> D. Gaya dorong gerobak bertambah karena air</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Soal 6 – Momentum (Analisis Perbandingan)</h3>
+                <p>Dua bola memiliki massa berbeda dan bergerak dengan kecepatan yang sama. Bola bermassa lebih besar menyebabkan dinding bergoyang lebih kuat saat tumbukan.</p>
+                <p>Kesimpulan ilmiah yang paling tepat adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q6" value="A"> A. Kecepatan lebih berpengaruh daripada massa</label>
+                    <label><input type="radio" name="q6" value="B"> B. Momentum dipengaruhi oleh massa dan kecepatan</label>
+                    <label><input type="radio" name="q6" value="C"> C. Massa tidak berpengaruh pada tumbukan</label>
+                    <label><input type="radio" name="q6" value="D"> D. Gaya gesek dinding memperbesar momentum bola</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Soal 7 – Impuls (Penalaran Sebab–Akibat)</h3>
+                <p>Simulasi menunjukkan bahwa penggunaan bantalan lunak mengurangi gaya benturan meskipun bola berhenti total.</p>
+                <p>Penjelasan ilmiah yang paling tepat adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q7" value="A"> A. Bantalan mengurangi perubahan momentum</label>
+                    <label><input type="radio" name="q7" value="B"> B. Bantalan memperbesar waktu tumbukan sehingga gaya rata-rata mengecil</label>
+                    <label><input type="radio" name="q7" value="C"> C. Bantalan memperkecil waktu tumbukan</label>
+                    <label><input type="radio" name="q7" value="D"> D. Bantalan menghilangkan gaya reaksi</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Soal 8 – Integrasi Newton dan Impuls (C5 – Evaluasi)</h3>
+                <p>Dua mobil dengan massa sama berhenti dari kecepatan yang sama. Mobil A direm perlahan, mobil B direm mendadak.</p>
+                <p>Pernyataan yang paling tepat berdasarkan simulasi adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q8" value="A"> A. Mobil A mengalami gaya lebih besar karena berhenti lebih lama</label>
+                    <label><input type="radio" name="q8" value="B"> B. Mobil B mengalami gaya lebih besar karena waktu pengereman lebih singkat</label>
+                    <label><input type="radio" name="q8" value="C"> C. Momentum awal mobil A lebih kecil</label>
+                    <label><input type="radio" name="q8" value="D"> D. Gaya gesek pada mobil A lebih kecil karena massanya sama</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Soal 9 – Problem Solving Terpadu (Analisis Model)</h3>
+                <p>Jika gaya pada benda tetap tetapi percepatan tidak berubah meskipun massa ditambah, maka kesimpulan paling masuk akal adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q9" value="A"> A. Gaya gesek diabaikan dalam simulasi</label>
+                    <label><input type="radio" name="q9" value="B"> B. Resultan gaya ikut bertambah sebanding dengan massa</label>
+                    <label><input type="radio" name="q9" value="C"> C. Massa tidak memengaruhi gerak benda</label>
+                    <label><input type="radio" name="q9" value="D"> D. Hukum II Newton tidak berlaku</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>Soal 10 – Argumentasi Ilmiah (Evaluasi Pernyataan)</h3>
+                <p>Seorang siswa menyimpulkan: “Untuk mengurangi risiko cedera saat kecelakaan, waktu tumbukan harus diperbesar.”</p>
+                <p>Argumen ilmiah yang paling kuat untuk mendukung pernyataan tersebut adalah …</p>
+                <div class="options">
+                    <label><input type="radio" name="q10" value="A"> A. Memperbesar waktu tumbukan memperbesar impuls</label>
+                    <label><input type="radio" name="q10" value="B"> B. Gaya rata-rata berbanding terbalik dengan waktu tumbukan</label>
+                    <label><input type="radio" name="q10" value="C"> C. Momentum benda dapat dihilangkan</label>
+                    <label><input type="radio" name="q10" value="D"> D. Gaya berat berkurang saat tumbukan</label>
+                </div>
+            </div>
+            <button type="button" id="submit-btn">Kirim Jawaban</button>
+        </form>
+        <div id="result">
+            <h2>Hasil Kuis</h2>
+            <p id="user-info-display"></p>
+            <p id="score-text"></p>
+            <button id="drive-button" onclick="window.open('https://drive.google.com/drive/folders/11cRgBLuUBpnbkQQhW8ytGgHt3Vv6UUKp?usp=sharing', '_blank')">Kirim Bukti Screenshot Nilai ke Google Drive</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            const nama = document.getElementById('nama').value.trim();
+            const kelas = document.getElementById('kelas').value.trim();
+
+            if (!nama || !kelas) {
+                alert('Harap isi nama dan kelas terlebih dahulu.');
+                return;
+            }
+
+            const answers = {
+                q1: 'A',
+                q2: 'C',
+                q3: 'B',
+                q4: 'C',
+                q5: 'C',
+                q6: 'B',
+                q7: 'B',
+                q8: 'B',
+                q9: 'B',
+                q10: 'B'
+            };
+
+            let score = 0;
+            const totalQuestions = 10;
+            let allAnswered = true;
+
+            for (let i = 1; i <= totalQuestions; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selected) {
+                    allAnswered = false;
+                    break;
+                }
+                if (selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+
+            if (!allAnswered) {
+                alert('Harap jawab semua soal sebelum mengirim.');
+                return;
+            }
+
+            const percentage = (score / totalQuestions) * 100;
+            document.getElementById('user-info-display').innerText = `Nama: ${nama} | Kelas: ${kelas}`;
+            document.getElementById('score-text').innerText = `Anda menjawab benar ${score} dari ${totalQuestions} soal (${percentage.toFixed(0)}%).`;
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('drive-button').style.display = 'inline-block';
+        });
+    </script>
+</body>
+</html>

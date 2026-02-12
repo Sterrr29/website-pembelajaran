@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Gaya: Berat, Normal, dan Gesekan</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        canvas {
+            border: 3px solid #fff;
+            background: linear-gradient(to bottom, #e0e0e0 0%, #a0a0a0 100%);
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .controls {
+            margin: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        label {
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        input[type="range"] {
+            width: 120px;
+            margin: 0 10px;
+        }
+        .info {
+            margin-top: 20px;
+            font-size: 18px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            text-align: left;
+        }
+        .info p {
+            margin: 5px 0;
+        }
+        .play-pause {
+            margin: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .equations {
+            margin-top: 20px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simulasi Gaya Fisika: Berat, Normal, dan Gesekan</h1>
+    <p>Geser slider untuk mengubah massa objek, sudut kemiringan, dan koefisien gesekan. Klik Play untuk melihat objek bergerak secara real-time!</p>
+    <div class="controls">
+        <label>Massa (kg): <span id="massValue">5</span> <input type="range" id="mass" min="1" max="10" value="5"></label>
+        <label>Sudut Kemiringan (°): <span id="angleValue">30</span> <input type="range" id="angle" min="0" max="45" value="30"></label>
+        <label>Koefisien Gesekan: <span id="frictionValue">0.3</span> <input type="range" id="friction" min="0" max="1" step="0.1" value="0.3"></label>
+    </div>
+    <div class="play-pause">
+        <button id="playPause">Play</button>
+    </div>
+    <canvas id="simulation" width="800" height="600"></canvas>
+    <div class="info">
+        <p><strong>Gaya Berat (Weight):</strong> <span id="weight">0</span> N (ke bawah)</p>
+        <p><strong>Gaya Normal:</strong> <span id="normal">0</span> N (tegak lurus permukaan)</p>
+        <p><strong>Gaya Gesekan:</strong> <span id="frictionForce">0</span> N (berlawanan gerakan)</p>
+        <p><strong>Resultan Gaya</strong> <span id="netForce">0</span> N (sepanjang kemiringan)</p>
+        <p><strong>Percepatan:</strong> <span id="acceleration">0</span> m/s²</p>
+    </div>
+    <div class="equations">
+        <p><strong>Persamaan:</strong></p>
+        <p>Gaya Berat: W = m * g</p>
+        <p>Gaya Normal: N = W * cos(θ)</p>
+        <p>Gaya Gesekan: f ≤ μ * N</p>
+        <p>Resultan Gaya: F_net = W * sin(θ) - f</p>
+        <p>Percepatan: a = F_net / m</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simulation');
+        const ctx = canvas.getContext('2d');
+        const massInput = document.getElementById('mass');
+        const angleInput = document.getElementById('angle');
+        const frictionInput = document.getElementById('friction');
+        const massValue = document.getElementById('massValue');
+        const angleValue = document.getElementById('angleValue');
+        const frictionValue = document.getElementById('frictionValue');
+        const weightSpan = document.getElementById('weight');
+        const normalSpan = document.getElementById('normal');
+        const frictionSpan = document.getElementById('frictionForce');
+        const netSpan = document.getElementById('netForce');
+        const accelSpan = document.getElementById('acceleration');
+        const playPauseBtn = document.getElementById('playPause');
+
+        const g = 9.81; // Gravitasi (m/s²)
+        let mass = 5;
+        let angle = 30;
+        let mu = 0.3; // Koefisien gesekan
+        let isPlaying = false;
+        let animationId;
+        let boxPosition = 0; // Posisi objek sepanjang kemiringan (0 to 1)
+        let velocity = 0; // Kecepatan objek
+        const inclineLength = 400;
+
+        function updateValues() {
+            mass = parseFloat(massInput.value);
+            angle = parseFloat(angleInput.value);
+            mu = parseFloat(frictionInput.value);
+            massValue.textContent = mass;
+            angleValue.textContent = angle;
+            frictionValue.textContent = mu;
+            if (!isPlaying) {
+                boxPosition = 0;
+                velocity = 0;
+                drawSimulation();
+            }
+        }
+
+        function drawSimulation() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Hitung gaya
+            const weight = mass * g;
+            const normal = weight * Math.cos(angle * Math.PI / 180);
+            const frictionMax = mu * normal;
+            const componentParallel = weight * Math.sin(angle * Math.PI / 180);
+            const friction = Math.min(frictionMax, componentParallel); // Gesekan kinetik
+            const netForce = componentParallel - friction;
+            const acceleration = netForce / mass;
+
+            // Update display
+            weightSpan.textContent = weight.toFixed(2);
+            normalSpan.textContent = normal.toFixed(2);
+            frictionSpan.textContent = friction.toFixed(2);
+            netSpan.textContent = netForce.toFixed(2);
+            accelSpan.textContent = acceleration.toFixed(2);
+
+            // Gambar permukaan miring dengan gradien
+            const inclineHeight = inclineLength * Math.sin(angle * Math.PI / 180);
+            const startX = 100;
+            const startY = canvas.height - 100;
+            const endX = startX + inclineLength;
+            const endY = startY - inclineHeight;
+
+            const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
+            gradient.addColorStop(0, '#8B4513');
+            gradient.addColorStop(1, '#654321');
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+
+            // Gambar objek (kotak dengan gradien dan bayangan)
+            const boxSize = 40;
+            const boxX = startX + boxPosition * inclineLength - boxSize / 2;
+            const boxY = startY - boxPosition * inclineHeight - boxSize / 2;
+
+            // Bayangan
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(boxX + 5, boxY + 5, boxSize, boxSize);
+
+            // Kotak dengan gradien
+            const boxGradient = ctx.createLinearGradient(boxX, boxY, boxX + boxSize, boxY + boxSize);
+            boxGradient.addColorStop(0, '#4CAF50');
+            boxGradient.addColorStop(1, '#2E7D32');
+            ctx.fillStyle = boxGradient;
+            ctx.fillRect(boxX, boxY, boxSize, boxSize);
+            ctx.strokeStyle = '#1B5E20';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX, boxY, boxSize, boxSize);
+
+            // Gambar panah gaya berat (merah, ke bawah)
+            drawArrow(boxX + boxSize / 2, boxY + boxSize, boxX + boxSize / 2, boxY + boxSize + 80, 'red', 'Gaya Berat');
+
+            // Gambar panah gaya normal (biru, tegak lurus permukaan)
+            const normalAngle = angle * Math.PI / 180;
+            const normalX = boxX + boxSize / 2 + 50 * Math.cos(normalAngle);
+            const normalY = boxY + boxSize / 2 - 50 * Math.sin(normalAngle);
+            drawArrow(boxX + boxSize / 2, boxY + boxSize / 2, normalX, normalY, 'blue', 'Gaya Normal');
+
+            // Gambar panah gaya gesekan (hijau, berlawanan kemiringan)
+            const frictionX = boxX + boxSize / 2 - 50 * Math.cos(normalAngle);
+            const frictionY = boxY + boxSize / 2 + 50 * Math.sin(normalAngle);
+            drawArrow(boxX + boxSize / 2, boxY + boxSize / 2, frictionX, frictionY, 'green', 'Gaya Gesekan');
+
+            // Gambar panah resultan gaya (hitam, sepanjang kemiringan)
+            if (netForce > 0) {
+                const netX = boxX + boxSize / 2 + 50 * Math.sin(normalAngle);
+                const netY = boxY + boxSize / 2 + 50 * Math.cos(normalAngle);
+                drawArrow(boxX + boxSize / 2, boxY + boxSize / 2, netX, netY, 'black', 'Resultan Gaya');
+            }
+
+            // Tambahkan jejak gerakan jika sedang animasi
+            if (isPlaying && boxPosition > 0) {
+                ctx.strokeStyle = 'rgba(255,0,0,0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(boxX + boxSize / 2, boxY + boxSize / 2);
+                ctx.stroke();
+            }
+        }
+
+        function drawArrow(fromX, fromY, toX, toY, color, label) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+
+            // Panah kepala dengan efek
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            const headLength = 12;
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+
+            // Label dengan bayangan
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText(label, (fromX + toX) / 2 + 1, (fromY + toY) / 2 - 9);
+            ctx.fillStyle = color;
+            ctx.fillText(label, (fromX + toX) / 2, (fromY + toY) / 2 - 10);
+        }
+
+        function animate() {
+            if (!isPlaying) return;
+
+            // Hitung percepatan dan update posisi
+            const weight = mass * g;
+            const componentParallel = weight * Math.sin(angle * Math.PI / 180);
+            const normal = weight * Math.cos(angle * Math.PI / 180);
+            const frictionMax = mu * normal;
+            const friction = Math.min(frictionMax, componentParallel);
+            const netForce = componentParallel - friction;
+            const acceleration = netForce / mass;
+
+            // Update kecepatan dan posisi (skala waktu untuk animasi)
+            velocity += acceleration * 0.02; // Delta time sederhana
+            boxPosition += velocity * 0.02 / inclineLength; // Normalisasi posisi
+
+            // Batasi posisi
+            if (boxPosition > 1) {
+                boxPosition = 1;
+                velocity = 0;
+                isPlaying = false;
+                playPauseBtn.textContent = 'Play';
+            }
+
+            drawSimulation();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+            if (isPlaying) {
+                animate();
+            } else {
+                cancelAnimationFrame(animationId);
+            }
+        });
+
+        // Event listeners untuk slider
+        massInput.addEventListener('input', updateValues);
+        angleInput.addEventListener('input', updateValues);
+        frictionInput.addEventListener('input', updateValues);
+
+        // Inisialisasi
+        updateValues();
+    </script>
+</body>
+</html>

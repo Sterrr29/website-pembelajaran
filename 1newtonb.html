@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhET Simulation Embed</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #f3e5f5, #fff3e0); /* Soft pastel gradient: light blue, lavender, peach */
+            color: #424242; /* Dark gray for text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8); /* Semi-transparent white for contrast */
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #6a1b9a; /* Soft purple */
+        }
+        p {
+            font-size: 1.2em;
+            color: #757575; /* Medium gray */
+        }
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+            border-radius: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            margin: 20px;
+            text-align: center; /* Center the iframe */
+        }
+        .simulation-iframe {
+            width: 100%;
+            height: 600px; /* Adjust height as needed for the simulation */
+            border: none;
+            border-radius: 10px;
+        }
+        .instructions {
+            width: 95%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+            border-radius: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            margin: 20px;
+            text-align: left; /* Left-align for readability */
+        }
+        .instructions h2 {
+            color: #6a1b9a; /* Soft purple to match header */
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+        .instructions h3 {
+            color: #424242; /* Dark gray */
+            font-size: 1.5em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .instructions p {
+            font-size: 1em;
+            color: #424242;
+            margin: 5px 0;
+        }
+        .instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            color: #9e9e9e; /* Light gray */
+            font-size: 0.9em;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            .simulation-iframe {
+                height: 400px; /* Smaller height on mobile for better fit */
+            }
+            .instructions h2 {
+                font-size: 1.5em;
+            }
+            .instructions h3 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PhET Simulation</h1>
+        <p>Explore interactive physics simulations in a serene, colorful environment.</p>
+    </header>
+    <div class="container">
+        <iframe src="https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/forces-and-motion-basics_all.html?locale=in" class="simulation-iframe" title="PhET Forces and Motion Basics Simulation" allowfullscreen></iframe>
+    </div>
+    <div class="instructions">
+        <h2>Langkah Kerja</h2>
+        <h3>A. Percobaan 1 – Benda Diam Tetap Diam</h3>
+        <ul>
+            <li>Buka simulasi PhET Gaya dan Gerak: Dasar.</li>
+            <li>Pilih menu Gerak (Motion).</li>
+            <li>Centang opsi Kecepatan.</li>
+            <li>Atur Gaya = 0 N.</li>
+            <li>Amati keadaan benda selama 10 detik.</li>
+            <li>Catat:</li>
+            <ul>
+                <li>Apakah benda bergerak?</li>
+                <li>Berapa nilai kecepatannya?</li>
+            </ul>
+        </ul>
+        <h3>B. Percobaan 2 – Benda Bergerak Tetap Bergerak</h3>
+        <ul>
+            <li>Geser slider gaya ke +200 N selama ±3 detik hingga benda bergerak.</li>
+            <li>Kembalikan gaya ke 0 N.</li>
+            <li>Amati nilai kecepatan benda.</li>
+            <li>Catat:</li>
+            <ul>
+                <li>Apakah kecepatan berubah?</li>
+                <li>Apakah benda berhenti?</li>
+            </ul>
+        </ul>
+    </div>
+    <footer>
+        <p>Embedded from PhET. Enjoy learning!</p>
+    </footer>
+</body>
+</html>

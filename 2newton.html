@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulasi Hukum Newton 2</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #b3cfe5; }
+    canvas { display: block; margin: 0 auto; border: 1px solid #000; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="500"></canvas>
+  <script>
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    var mouseX, mouseY;
+    var dragging = false;
+    var activeSlider = null;
+
+    // Fungsi dasar untuk canvas
+    function aturCanvas() {
+      // Canvas sudah diinisialisasi di atas
+    }
+
+    function setJudul(title) {
+      document.title = title;
+    }
+
+    function hapusLayar(color) {
+      ctx.fillStyle = color || '#b3cfe5';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function teks(text, x, y, font, color, align) {
+      ctx.font = font;
+      ctx.fillStyle = color;
+      ctx.textAlign = align || 'left';
+      ctx.fillText(text, x, y);
+    }
+
+    function kotak(x, y, w, h, stroke, strokeColor, fillColor) {
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      if (fillColor) {
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = stroke;
+        ctx.stroke();
+      }
+    }
+
+    function garis(x1, y1, x2, y2, width, color) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+
+    function panah(x, y, dx, dy, headLen, width, color) {
+      var angle = Math.atan2(dy, dx);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + dx, y + dy);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+      // Head - diperbesar dan dengan outline untuk kejelasan
+      ctx.beginPath();
+      ctx.moveTo(x + dx, y + dy);
+      ctx.lineTo(x + dx - headLen * Math.cos(angle - Math.PI/6), y + dy - headLen * Math.sin(angle - Math.PI/6));
+      ctx.lineTo(x + dx - headLen * Math.cos(angle + Math.PI/6), y + dy - headLen * Math.sin(angle + Math.PI/6));
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = 'black'; // Outline hitam untuk kontras
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    function slider(s) {
+      // Draw slider track
+      garis(s.x, s.y + 10, s.x + s.p, s.y + 10, 2, 'black');
+      // Draw slider handle
+      var handleX = s.x + ((s.valS - s.minS) / (s.maxS - s.minS)) * s.p;
+      kotak(handleX - 5, s.y, 10, 20, 1, 'black', 'gray');
+      // Label
+      teks(s.valS.toFixed(s.desimal) + ' ' + s.label, s.x + s.p + 10, s.y + 15, '12pt Calibri', 'black');
+    }
+
+    function tombol(label, x, y, w, h, font, textColor, bgColor, borderColor, id) {
+      kotak(x, y, w, h, 1, borderColor, bgColor);
+      teks(label, x + w/2, y + h/2 + 5, font, textColor, 'center');
+    }
+
+    function cekSlider(event) {
+      mouseX = event.clientX - canvas.offsetLeft;
+      mouseY = event.clientY - canvas.offsetTop;
+      var sliders = [slider1, slider2, slider3];
+      for (var s of sliders) {
+        var handleX = s.x + ((s.valS - s.minS) / (s.maxS - s.minS)) * s.p;
+        if (mouseX >= handleX - 10 && mouseX <= handleX + 10 && mouseY >= s.y && mouseY <= s.y + 20) {
+          return s;
+        }
+      }
+      return null;
+    }
+
+    function cekTombol(event) {
+      mouseX = event.clientX - canvas.offsetLeft;
+      mouseY = event.clientY - canvas.offsetTop;
+      // Reset button
+      if (mouseX >= 450 && mouseX <= 570 && mouseY >= 300 && mouseY <= 340) {
+        return "Reset";
+      }
+      return "";
+    }
+
+    // Variabel simulasi
+    var slider1 = {tipe:"H", nama:"massa", x:100, y:300, p:200, minS:1, maxS:5, valS:2.0, desimal:1, label:"Kg"};
+    var slider2 = {tipe:"H", nama:"gaya", x:100, y:360, p:200, minS:-20, maxS:20, valS:0.0, desimal:1, label:"N"};
+    var slider3 = {tipe:"H", nama:"friksi", x:100, y:420, p:200, minS:0, maxS:1, valS:0.0, desimal:3, label:" "};
+
+    var index = -1;
+    var xBase = 300;
+    var yBase = 200;
+    var time = 0.0;
+    var x = 0.0;
+    var v = 0.0;
+    var a;
+    var m = 2.0;
+    var mu = 0;
+    var friction = 0;
+    var force = 0.0;
+    var xPos;
+    var yPos;
+    var timer;
+    var simAktif = 1;
+    var bergerak = 0;
+
+    function setSimulasi() {
+      if ((time >= 10000.0)) simAktif = 0;
+      if (simAktif == 1) {
+        // hapus layar
+        hapusLayar("#b3cfe5");
+
+        // menampilkan teks
+        teks("Gaya dan Gesekan", 0.5 * (canvas.width), 50, 'bold 16pt Calibri', 'blue', 'center');
+        teks("Massa = " + m + " Kg", 100, 280, 'bold 14pt Calibri', 'black', 'left');
+        slider(slider1);
+        teks("Gaya = " + force + " N", 100, 340, 'bold 14pt Calibri', 'black', 'left');
+        slider(slider2);
+        teks("Friksi = " + mu, 100, 400, 'bold 14pt Calibri', 'black', 'left');
+        slider(slider3);
+
+        tombol("Reset", 450, 300, 120, 40, "bold 12pt Calibri", "white", "black", "gray", "r");
+
+        index = index + 1;
+        time = index / 100.0;
+        oldv = v;
+
+        if (index > 0) {
+          a = (force + friction) / m;
+          v = v + a / 100;
+          x = x + v / 100;
+        }
+
+        // objek keluar pada sisi lainnya
+        if (x > 10) {
+          x = x - 20;
+        } else if (x < -10) {
+          x = x + 20;
+        }
+
+        xPos = canvas.width / 2 + 40 * x;
+        boxSize = 40 * Math.sqrt(m);
+
+        // kotak beban
+        kotak(xPos - boxSize / 2, yBase - boxSize, boxSize, boxSize, 1, "#000", "#6af");
+
+        // lantai
+        garis(0, yBase, canvas.width, yBase, 3, "#000");
+
+        // normal - panah diperbesar
+        panah(xPos, yBase - boxSize / 2 - 10, 0, 4 * m, 10, 4, "blue");
+        teks("F", xPos + 16, yBase - boxSize - 20, "bold 20pt Calibri", "blue");
+        teks("N", xPos + 28, yBase - boxSize - 12, "bold 14pt Calibri", "blue");
+
+        // gravitasi (massa) - panah diperbesar
+        panah(xPos, yBase - boxSize / 2 + 10, 0, -4 * m, 10, 4, "#282");
+        teks("F", xPos + 16, yBase + 20, "bold 20pt Calibri", "#282");
+        teks("g", xPos + 28, yBase + 28, "bold 14pt Calibri", "#282");
+
+        // panah gaya - diperbesar
+        var offset;
+        if (force > 0) {
+          offset = 10;
+        } else {
+          offset = -10;
+        }
+        panah(xPos + offset, yBase - boxSize / 2, 0.4 * force, 0, 10, 4, "#c00");
+        if (Math.abs(force) > 0.01) {
+          teks("F", xPos + offset + (5 + 2 * Math.abs(force)) * force / Math.abs(force),
+               yBase - boxSize / 2 + 12, "bold 20pt Calibri", "#c00");
+        }
+
+        if (bergerak == 0) {
+          friction = mu * 10 * m;
+          if (friction >= Math.abs(force)) {
+            friction = -force;
+            v = 0;
+          } else {
+            bergerak = 1;
+            friction = mu * 10 * m;
+            if (force > 0) friction = -friction;
+          }
+        } else {
+          friction = mu * 10 * m;
+          if ((v > 0) && (force > 0)) friction = -friction;
+          if (((v > 0) && (oldv < 0)) || ((v < 0) && (oldv > 0))) {
+            if (Math.abs(friction) >= Math.abs(force)) {
+              bergerak = 0;
+              v = 0.0;
+              friction = -force;
+            }
+          }
+        }
+
+        // gesekan / friksi - diperbesar
+        if (friction > 0) {
+          offset = 10;
+        } else {
+          offset = -10;
+        }
+        panah(xPos + offset, yBase - boxSize / 2, 0.4 * friction, 0, 10, 4, "black");
+        if (Math.abs(friction) > 0.01) {
+          teks("F", xPos + offset + (5 + 2 * Math.abs(friction)) * friction / Math.abs(friction),
+               yBase - boxSize / 2 - 20, "bold 20pt Calibri", "black");
+          teks("f", 8 + xPos + offset + (5 + 2 * Math.abs(friction)) * friction / Math.abs(friction),
+               yBase - boxSize / 2 - 12, "bold 14pt Calibri", "black");
+        }
+
+        var timeLabel = 'Waktu (t) = ' + time.toFixed(2) + ' s';
+        teks(timeLabel, 450, 280, "bold 14pt Calibri", "black", "left");
+      }
+    }
+
+    function mouseDown(event) {
+      activeSlider = cekSlider(event);
+      if (activeSlider) {
+        dragging = true;
+      }
+      canvas.onmousemove = mouseDrag;
+    }
+
+    function mouseUp(event) {
+      dragging = false;
+      activeSlider = null;
+      // prosedur mengecek tombol
+      var tombolAktif = cekTombol(event);
+      if (tombolAktif != "") {
+        if (tombolAktif == "Reset") reset();
+      }
+      // menetralkan drag
+      canvas.onmousemove = null;
+    }
+
+    function mouseDrag(event) {
+      if (dragging && activeSlider) {
+        mouseX = event.clientX - canvas.offsetLeft;
+        var ratio = (mouseX - activeSlider.x) / activeSlider.p;
+        ratio = Math.max(0, Math.min(1, ratio));
+        activeSlider.valS = activeSlider.minS + ratio * (activeSlider.maxS - activeSlider.minS);
+        if (activeSlider.nama == "massa") m = Number(activeSlider.valS);
+        if (activeSlider.nama == "gaya") force = Number(activeSlider.valS);
+        if (activeSlider.nama == "friksi") mu = Number(activeSlider.valS);
+      }
+    }
+
+    function jalankanSimulasi() {
+      setSimulasi();
+      if (simAktif == 1) {
+        timer = window.setTimeout(jalankanSimulasi, 10);
+      }
+    }
+
+    function reset() {
+      window.clearTimeout(timer);
+      index = -1;
+      time = 0.0;
+      x = 0;
+      v = 0;
+      slider1.valS = 2;
+      m = 2;
+      slider2.valS = 0;
+      force = 0;
+      slider3.valS = 0;
+      mu = 0;
+      simAktif = 1;
+      bergerak = 0;
+      jalankanSimulasi();
+    }
+
+    // Event listeners
+    canvas.onmousedown = mouseDown;
+    canvas.onmouseup = mouseUp;
+
+    // Start simulation
+    aturCanvas();
+    setJudul("Hukum Newton 2");
+    jalankanSimulasi();
+  </script>
+</body>
+</html>

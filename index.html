@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinamika Gerak - Pembelajaran Interaktif</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #60a5fa;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --muted: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--light);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1rem;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .main-content {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: #e2e8f0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .content-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .content-image {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin: 1rem 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .content-text {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .experiment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .experiment-item {
+            text-align: center;
+        }
+        
+        .experiment-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .experiment-item img:hover {
+            transform: scale(1.05);
+        }
+        
+        .experiment-item p {
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        
+        footer {
+            background: rgba(0, 0, 0, 0.3);
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.9);
+                padding: 1rem;
+                display: none;
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .experiment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Dinamika Gerak</div>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="#" class="nav-link active" data-target="petunjuk">Petunjuk</a></li>
+					<li class="nav-item"><a href="#" class="nav-link" data-target="tujuan">Tujuan</a></li>
+					<li class="nav-item"><a href="#" class="nav-link" data-target="masalah utama">Masalah Utama</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-target="eksperimen">Eksperimen</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-target="konsep fisika">Konsep Fisika</a></li>
+					<li class="nac-item"><a href="#" class="nav-link" data-target="latihan soal">Latihan Soal </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="hero">
+                <h1>Selamat Datang di Pembelajaran Dinamika Gerak</h1>
+                <p>Temukan keajaiban fisika melalui pembelajaran interaktif yang menyenangkan!</p>
+            </div>
+
+
+	<!-- Petunjuk Section -->
+<section id="petunjuk" class="content-section active">
+    <h2>Petunjuk Penggunaan Website Pembelajaran Dinamika Gerak</h2>
+    <h3>Buka Halaman Utama</h3>
+    <p class="content-text">
+        Saat pertama kali membuka website, Anda akan melihat halaman utama dengan judul “Selamat Datang di Pembelajaran Dinamika Gerak”. Halaman ini berfungsi sebagai pengantar pembelajaran.
+    </p>
+    <h3>Kenali Menu Navigasi</h3>
+    <p class="content-text">
+        Pada bagian atas halaman terdapat menu Tujuan, Masalah Utama, Eksperimen, Konsep Fisika, dan Latihan Soal. Gunakan menu-menu tersebut untuk berpindah antar bagian pembelajaran.
+    </p>
+	    <h3>Pelajari Tujuan Pembelajaran</h3>
+    <p class="content-text">
+        Klik menu Tujuan untuk mengetahui kompetensi dan hasil belajar yang diharapkan pada setiap pertemuan, yaitu:
+    </p>
+    <ul class="content-text">
+        <li>Tujuan Pembelajaran 1: Hukum Newton I</li>
+        <li>Tujuan Pembelajaran 2: Hukum Newton II</li>
+        <li>Tujuan Pembelajaran 3: Hukum Newton III</li>
+        <li>Tujuan Pembelajaran 4: Jenis-jenis Gaya</li>
+        <li>Tujuan Pembelajaran 5: Momentum dan Impuls</li>
+    </ul>
+    <h3>Masuk ke Menu Masalah Utama</h3>
+    <p class="content-text">
+        Secara default atau dengan mengklik menu Masalah Utama, Anda akan diarahkan ke bagian Permasalahan yang berisi beberapa ilustrasi masalah terkait dinamika gerak.
+    </p>
+    <h3>Pilih Permasalahan</h3>
+    <p class="content-text">
+        Klik salah satu gambar permasalahan berikut:
+    </p>
+    <ul class="content-text">
+        <li>Masalah 1: Hukum Newton I</li>
+        <li>Masalah 2: Hukum Newton II</li>
+        <li>Masalah 3: Hukum Newton III</li>
+        <li>Masalah 4: Jenis-jenis Gaya</li>
+        <li>Masalah 5: Momentum dan Impuls</li>
+    </ul>
+    <h3>Pahami Permasalahan</h3>
+    <p class="content-text">
+        Bacalah permasalahan yang disajikan untuk memahami konteks dan fenomena fisika yang terjadi dalam kehidupan sehari-hari.
+    </p>
+    <h3>Lakukan Eksperimen Virtual</h3>
+    <p class="content-text">
+        Masuk ke menu Eksperimen untuk melakukan eksperimen atau simulasi virtual sesuai materi yang dipelajari. Pilih salah satu eksperimen berikut:
+    </p>
+    <ul class="content-text">
+        <li>Eksperimen 1: Hukum Newton I</li>
+        <li>Eksperimen 2:Hukum Newton II</li>
+        <li>Eksperimen 3:Hukum Newton III</li>
+        <li>Eksperimen 4:Jenis-jenis Gaya</li>
+        <li>Eksperimen 5:Momentum dan Impuls</li>
+    </ul>
+    <h3>Pelajari Konsep Fisika</h3>
+    <p class="content-text">
+        Masuk ke menu Konsep Fisika untuk mempelajari konsep, hukum, dan penjelasan ilmiah yang berkaitan dengan materi dinamika gerak, meliputi:
+    </p>
+    <ul class="content-text">
+        <li>Hukum Newton I</li>
+        <li>Hukum Newton II</li>
+        <li>Hukum Newton III</li>
+        <li>Jenis-jenis Gaya</li>
+        <li>Momentum dan Impuls</li>
+    </ul>
+    <h3>Analisis dan Kesimpulan</h3>
+    <p class="content-text">
+        Gunakan hasil eksperimen dan konsep fisika yang telah dipelajari untuk menganalisis permasalahan serta menarik kesimpulan. Tuliskan hasilnya pada LKPD atau lembar kerja yang disediakan.
+    </p>
+    <h3>Ulangi untuk Materi Lain</h3>
+    <p class="content-text">
+        Kembali ke menu Masalah Utama dan ulangi langkah-langkah di atas untuk mempelajari permasalahan lainnya.
+    </p>
+</section>
+
+<!-- Permasalahan Section -->
+            <section id="masalah utama" class="content-section">
+                <h2>Permasalahan</h2>
+                <p class="content-text">
+                    Klik pada gambar di bawah ini untuk mempelajari permasalahan spesifik terkait dinamika gerak.
+                </p>
+                <div class="experiment-grid">
+                    <div class="experiment-item">
+                        <a href="kasus1.html">
+                            <img src="animasi1/animasi1.png" alt="Permasalahan 1">
+                        </a>
+                        <p>Masalah 1</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="kasus2.html">
+                            <img src="animasi2/animasi2.png" alt="Permasalahan 2">
+                        </a>
+                        <p>Masalah 2</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="kasus3.html">
+                            <img src="animasi3/animasi3.png" alt="Permasalahan 3">
+                        </a>
+                        <p>Masalah 3</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="kasus4.html">
+                            <img src="animasi4/animasi4.png" alt="Permasalahan 4">
+                        </a>
+                        <p>Masalah 4</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="kasus5.html">
+                            <img src="animasi5/animasi5.png" alt="Permasalahan 5">
+                        </a>
+                        <p>Masalah 5</p>
+                    </div>
+                </div>
+            </section>
+
+
+			<!-- Tujuan Section -->
+			<section id="tujuan" class="content-section">
+                <h2>Tujuan</h2>
+                <p class="content-text">
+                    Klik pada gambar di bawah ini untuk mempelajari tujuan pembelajaran spesifik.
+                </p>
+                <div class="experiment-grid">
+                    <div class="experiment-item">
+                        <a href="tp1.html">
+                            <img src="animasi1/animasi1.png" alt="Tujuan Pembelajaran 1">
+                        </a>
+                        <p>Tujuan Pembeajaran Pertemuan 1</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="tp2.html">
+                            <img src="animasi2/animasi2.png" alt="Tujuan Pembelajaran 2">
+                        </a>
+                        <p>Tujuan Pembelajaran Pertemuan 2</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="tp3.html">
+                            <img src="animasi3/animasi3.png" alt="Tujuan Pembelajaran 3">
+                        </a>
+                        <p>Tujuan Pembelajaran Pertemuan 3</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="tp4.html">
+                            <img src="animasi4/animasi4.png" alt="Tujuan Pembelajaran 4">
+                        </a>
+                        <p>Tujuan Pembelajaran Pertemuan 4</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="tp5.html">
+                            <img src="animasi5/animasi5.png" alt="Tujuan Pembelajaran 5">
+                        </a>
+                        <p>Tujuan Pembelajaran Pertemuan 5</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Eksperimen Section -->
+            <section id="eksperimen" class="content-section">
+                <h2>Eksperimen Virtual</h2>
+                <p class="content-text">
+                    Klik pada gambar di bawah ini untuk memulai eksperimen virtual interaktif tentang dinamika gerak.
+                </p>
+                <div class="experiment-grid">
+                    <div class="experiment-item">
+                        <a href="1newtonc.html">
+                            <img src="animasi1/animasi1.png" alt="Eksperimen Hukum Newton Pertama">
+                        </a>
+                        <p>Hukum Newton I</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="2newton.html">
+                            <img src="animasi2/animasi2.png" alt="Eksperimen Hukum Newton Kedua">
+                        </a>
+                        <p>Hukum Newton II</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="3newtonc.html">
+                            <img src="animasi3/animasi3.png" alt="Eksperimen Hukum Newton Ketiga">
+                        </a>
+                        <p>Hukum Newton III</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="jenisgaya.html">
+                            <img src="animasi4/animasi4.png" alt="Eksperimen Jenis-jenis Gaya">
+                        </a>
+                        <p>Jenis-jenis Gaya</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="momentumimpuls.html">
+                            <img src="animasi5/animasi5.png" alt="Eksperimen Momentum dan Impuls">
+                        </a>
+                        <p>Momentum dan Impuls</p>
+                    </div>
+                </div>
+            </section>
+			
+			<!-- Konsep Fisika Section -->
+            <section id="konsep fisika" class="content-section">
+                <h2>Konsep Fisika</h2>
+                <p class="content-text">
+                    Klik pada gambar di bawah ini untuk memahami konsep fisika secara interaktif tentang dinamika gerak.
+                </p>
+                <div class="experiment-grid">
+                    <div class="experiment-item">
+                        <a href="kp1.html">
+                            <img src="animasi1/animasi1.png" alt="Eksperimen Hukum Newton Pertama">
+                        </a>
+                        <p>Hukum Newton I</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="kp2.html">
+                            <img src="animasi2/animasi2.png" alt="Eksperimen Hukum Newton Kedua">
+                        </a>
+                        <p>Hukum Newton II</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="kp3.html">
+                            <img src="animasi3/animasi3.png" alt="Eksperimen Hukum Newton Ketiga">
+                        </a>
+                        <p>Hukum Newton III</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="kp4.html">
+                            <img src="animasi4/animasi4.png" alt="Eksperimen Jenis-jenis Gaya">
+                        </a>
+                        <p>Jenis-jenis Gaya</p>
+                    </div>
+                    <div class="experiment-item">
+                        <a href="kp5.html">
+                            <img src="animasi5/animasi5.png" alt="Eksperimen Momentum dan Impuls">
+                        </a>
+                        <p>Momentum dan Impuls</p>
+                    </div>
+                </div>
+            </section>
+			
+			<!-- Latihan Soal Section -->
+			<section id="latihan soal" class="content-section">
+				<h2>Latihan Soal</h2>
+				<p class="content-text">
+                    Klik pada tombol di bawah ini untuk masuk ke latihan soal tentang dinamika gerak.
+                </p>
+                <div class="experiment-grid">
+                    <div class="experiment-item">
+                        <a href="latsol.html">
+                            <img src="latsol/latsol.png" alt="Eksperimen Hukum Newton Pertama">
+                        </a>
+
+</li>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2026 Pembelajaran Dinamika Gerak dibuat oleh Ester Maesya Tamba. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+            
+            // Fungsi untuk mengubah konten berdasarkan navigasi
+            function changeContent(targetId) {
+                // Sembunyikan semua section
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Tampilkan section yang dipilih
+                document.getElementById(targetId).classList.add('active');
+                
+                // Update navigasi aktif
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('data-target') === targetId) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            // Event listener untuk setiap navigasi
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('data-target');
+                    changeContent(target);
+                    
+                    // Smooth scroll ke atas
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Animasi tambahan untuk engagement
+            const hero = document.querySelector('.hero');
+            hero.style.opacity = '0';
+            hero.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                hero.style.transition = 'all 0.8s ease';
+                hero.style.opacity = '1';
+                hero.style.transform = 'translateY(0)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>

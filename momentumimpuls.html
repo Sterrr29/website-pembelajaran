@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momentum and Impulse Simulation</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        canvas { 
+            border: 3px solid #fff; 
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0); 
+            display: block; 
+            margin: 20px auto; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+        }
+        .controls { 
+            margin: 20px; 
+            background: rgba(255,255,255,0.1); 
+            padding: 15px; 
+            border-radius: 10px; 
+        }
+        label { 
+            display: inline-block; 
+            margin: 10px; 
+            color: white; 
+        }
+        input { 
+            margin-left: 5px; 
+        }
+        button { 
+            padding: 10px 20px; 
+            margin: 10px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: background 0.3s; 
+        }
+        button:hover { 
+            background: #45a049; 
+        }
+        .info { 
+            margin-top: 20px; 
+            font-size: 18px; 
+            background: rgba(255,255,255,0.1); 
+            padding: 10px; 
+            border-radius: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Momentum and Impulse Simulation</h1>
+    <p>Drag the balls to position them, adjust sliders for mass and velocity, then click "Start Collision" to simulate. This demonstrates conservation of momentum in elastic collisions with bouncing off walls.</p>
+    
+    <div class="controls">
+        <label>Ball 1 Mass (kg): <input type="range" id="mass1" min="1" max="10" value="5"></label>
+        <label>Ball 1 Velocity (m/s): <input type="range" id="vel1" min="-10" max="10" value="2"></label>
+        <br>
+        <label>Ball 2 Mass (kg): <input type="range" id="mass2" min="1" max="10" value="3"></label>
+        <label>Ball 2 Velocity (m/s): <input type="range" id="vel2" min="-10" max="10" value="-1"></label>
+        <br>
+        <button id="startBtn">Start Simulation</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+    
+    <canvas id="canvas" width="800" height="400"></canvas>
+    
+    <div class="info">
+        <p id="momentumBefore">Initial Momentum: 7.00 kg·m/s</p>  <!-- Updated with calculated value -->
+        <p id="momentumAfter">Final Momentum: 7.00 kg·m/s</p>  <!-- Will update to 7.00 after collision -->
+        <p id="impulse">Impulse on Ball 1: -11.25 N·s</p>  <!-- Will update to -11.25 after collision -->
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const mass1Slider = document.getElementById('mass1');
+        const vel1Slider = document.getElementById('vel1');
+        const mass2Slider = document.getElementById('mass2');
+        const vel2Slider = document.getElementById('vel2');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const momentumBeforeEl = document.getElementById('momentumBefore');
+        const momentumAfterEl = document.getElementById('momentumAfter');
+        const impulseEl = document.getElementById('impulse');
+
+        let ball1 = { x: 200, y: 200, radius: 20, mass: 5, vx: 2, vy: 0, color: 'red', dragging: false, originalColor: 'red' };
+        let ball2 = { x: 600, y: 200, radius: 20, mass: 3, vx: -1, vy: 0, color: 'blue', dragging: false, originalColor: 'blue' };
+        let animating = false;
+        let effects = []; // For collision effects
+
+        function drawBall(ball) {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = ball.color;
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.stroke();
+            ctx.fillStyle = 'black';
+            ctx.font = '12px Arial';
+            ctx.fillText(`m=${ball.mass}`, ball.x - 10, ball.y - 25);
+            ctx.fillText(`v=${ball.vx.toFixed(1)}`, ball.x - 15, ball.y + 30);
+        }
+
+        function drawEffects() {
+            effects.forEach((effect, index) => {
+                ctx.beginPath();
+                ctx.arc(effect.x, effect.y, effect.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 255, 0, ${effect.alpha})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                effect.radius += 2;
+                effect.alpha -= 0.02;
+                if (effect.alpha <= 0) {
+                    effects.splice(index, 1);
+                }
+            });
+        }
+
+        function update() {
+            if (!animating) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawEffects();
+            drawBall(ball1);
+            drawBall(ball2);
+
+            // Move balls
+            ball1.x += ball1.vx;
+            ball2.x += ball2.vx;
+
+            // Bounce off walls
+            if (ball1.x - ball1.radius <= 0 || ball1.x + ball1.radius >= canvas.width) {
+                ball1.vx = -ball1.vx;
+                ball1.color = 'orange'; // Temporary color change
+                setTimeout(() => ball1.color = ball1.originalColor, 200);
+            }
+            if (ball2.x - ball2.radius <= 0 || ball2.x + ball2.radius >= canvas.width) {
+                ball2.vx = -ball2.vx;
+                ball2.color = 'purple'; // Temporary color change
+                setTimeout(() => ball2.color = ball2.originalColor, 200);
+            }
+
+            // Check collision
+            const dx = ball2.x - ball1.x;
+            const dy = ball2.y - ball1.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < ball1.radius + ball2.radius) {
+                // Elastic collision in 1D (along x-axis)
+                const v1 = ((ball1.mass - ball2.mass) * ball1.vx + 2 * ball2.mass * ball2.vx) / (ball1.mass + ball2.mass);
+                const v2 = ((ball2.mass - ball1.mass) * ball2.vx + 2 * ball1.mass * ball1.vx) / (ball1.mass + ball2.mass);
+                const initialV1 = ball1.vx;
+                ball1.vx = v1;
+                ball2.vx = v2;
+                // Impulse on ball1: change in momentum
+                const impulse = ball1.mass * (v1 - initialV1);
+                impulseEl.textContent = `Impulse on Ball 1: ${impulse.toFixed(2)} N·s`;
+                momentumAfterEl.textContent = `Final Momentum: ${(ball1.mass * ball1.vx + ball2.mass * ball2.vx).toFixed(2)} kg·m/s`;
+                // Add collision effect
+                effects.push({ x: (ball1.x + ball2.x) / 2, y: (ball1.y + ball2.y) / 2, radius: 10, alpha: 1 });
+                // Change colors temporarily
+                ball1.color = 'yellow';
+                ball2.color = 'green';
+                setTimeout(() => {
+                    ball1.color = ball1.originalColor;
+                    ball2.color = ball2.originalColor;
+                }, 300);
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        function reset() {
+            ball1.x = 200;
+            ball1.y = 200;
+            ball1.mass = parseInt(mass1Slider.value);
+            ball1.vx = parseFloat(vel1Slider.value);
+            ball1.color = ball1.originalColor;
+            ball2.x = 600;
+            ball2.y = 200;
+            ball2.mass = parseInt(mass2Slider.value);
+            ball2.vx = parseFloat(vel2Slider.value);
+            ball2.color = ball2.originalColor;
+            animating = false;
+            effects = [];
+            updateMomentum();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall(ball1);
+            drawBall(ball2);
+        }
+
+        function updateMomentum() {
+            const totalMomentum = ball1.mass * ball1.vx + ball2.mass * ball2.vx;
+            momentumBeforeEl.textContent = `Initial Momentum: ${totalMomentum.toFixed(2)} kg·m/s`;
+            momentumAfterEl.textContent = `Final Momentum: 0.00 kg·m/s`;  // Reset to 0, will update on collision
+            impulseEl.textContent = `Impulse on Ball 1: 0.00 N·s`;  // Reset to 0, will update on collision
+        }
+
+        // Event listeners
+        mass1Slider.addEventListener('input', () => { ball1.mass = parseInt(mass1Slider.value); updateMomentum(); });
+        vel1Slider.addEventListener('input', () => { ball1.vx = parseFloat(vel1Slider.value); updateMomentum(); });
+        mass2Slider.addEventListener('input', () => { ball2.mass = parseInt(mass2Slider.value); updateMomentum(); });
+        vel2Slider.addEventListener('input', () => { ball2.vx = parseFloat(vel2Slider.value); updateMomentum(); });
+
+        startBtn.addEventListener('click', () => {
+            if (!animating) {
+                animating = true;
+                update();
+            }
+        });
+
+        resetBtn.addEventListener('click', reset);
+
+        // Mouse interaction for dragging
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            if (Math.sqrt((mouseX - ball1.x)**2 + (mouseY - ball1.y)**2) < ball1.radius) {
+                ball1.dragging = true;
+            } else if (Math.sqrt((mouseX - ball2.x)**2 + (mouseY - ball2.y)**2) < ball2.radius) {
+                ball2.dragging = true;
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (ball1.dragging) {
+                const rect = canvas.getBoundingClientRect();
+                ball1.x = e.clientX - rect.left;
+                ball1.y = e.clientY - rect.top;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawEffects();
+                drawBall(ball1);
+                drawBall(ball2);
+            } else if (ball2.dragging) {
+                const rect = canvas.getBoundingClientRect();
+                ball2.x = e.clientX - rect.left;
+                ball2.y = e.clientY - rect.top;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawEffects();
+                drawBall(ball1);
+                drawBall(ball2);
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            ball1.dragging = false;
+            ball2.dragging = false;
+        });
+
+        // Initial draw
+        reset();
+    </script>
+</body>
+</html>
